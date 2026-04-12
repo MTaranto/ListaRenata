@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chá de Casa Nova da Renata</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-900 p-4 min-h-screen">
+    <div class="max-w-md mx-auto bg-gray-800 border border-gray-700 rounded-3xl shadow-xl overflow-hidden p-6">
+        <header class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-orange-600">Presentes da Renata 🎁</h1>
+            <p class="text-sm text-gray-400">Escolha um item para presentear!</p>
+        </header>
+
+        <div id="lista" class="space-y-4">
+            </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://dihsxacoolaqxlloliag.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_SQqUpy0HALaleCVE1af28w_8e3UEfwu';
+
+// CORREÇÃO: Mesma coisa aqui, usando 'db'
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function carregar() {
+            const { data, error } = await db.from('presentes').select('*').order('nome');
+            const listaDiv = document.getElementById('lista');
+
+            if (error) {
+                listaDiv.innerHTML = '<p class="text-center text-red-500 text-sm">Erro ao conectar com o banco.</p>';
+                return;
+            }
+
+            if (data.length === 0) {
+                listaDiv.innerHTML = '<p class="text-center text-gray-500 text-sm">A lista ainda está vazia.</p>';
+                return;
+            }
+
+            listaDiv.innerHTML = '';
+
+            data.forEach(item => {
+                const meuNome = localStorage.getItem('usuario_nome');
+                const souEu = item.comprador === meuNome;
+
+                // Lógica visual dos botões e selos
+                let acaoHTML = '';
+
+                if (item.comprado) {
+                    acaoHTML = `
+                        <div class="flex flex-col items-end justify-center">
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Escolhido por</span>
+                            <span class="bg-green-500/20 border border-green-500/30 text-green-400 px-3 py-1 rounded-full text-xs font-bold shadow-sm whitespace-nowrap mb-1">
+                                ${item.comprador}
+                            </span>
+                            ${souEu ? `<button onclick="desbloquear('${item.id}')" class="text-[10px] text-red-400 hover:text-red-300 uppercase tracking-wide font-semibold underline underline-offset-2 mt-1">Desistir</button>` : ''}
+                        </div>
+                    `;
+                } else {
+                    acaoHTML = `<button onclick="comprar('${item.id}')" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg transition transform hover:scale-105">Comprar!</button>`;
+                }
+
+                listaDiv.innerHTML += `
+                    <div class="border border-gray-700 p-4 rounded-2xl ${item.comprado ? 'bg-gray-800 opacity-75' : 'bg-gray-700 shadow-sm'} transition-all">
+                        <div class="flex justify-between items-center gap-4">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-lg mb-1 ${item.comprado ? 'line-through text-gray-500' : 'text-gray-100'}">${item.nome}</h3>
+                                <a href="${item.link}" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm underline inline-block">Ver na Shopee</a>
+                            </div>
+                            <div class="flex flex-col items-end flex-shrink-0">
+                                ${acaoHTML}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function comprar(id) {
+            let nome = localStorage.getItem('usuario_nome');
+            if (!nome) {
+                nome = prompt("Qual seu nome para a Renata saber quem deu o presente?");
+                if (!nome) return;
+                localStorage.setItem('usuario_nome', nome);
+            }
+
+            await db.from('presentes').update({ comprado: true, comprador: nome }).eq('id', id);
+            carregar();
+        }
+
+        async function desbloquear(id) {
+            if(confirm("Quer liberar esse presente para outra pessoa escolher?")) {
+                await db.from('presentes').update({ comprado: false, comprador: null }).eq('id', id);
+                carregar();
+            }
+        }
+
+        carregar();
+    </script>
+</body>
+</html>
