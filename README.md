@@ -26,8 +26,17 @@ Em vez de focar apenas na digitação de código bruto, atuei como um verdadeiro
 * **Back-End / Banco de Dados:** Supabase (PostgreSQL).
 * **Fluxo de Trabalho:** Linux (Zorin OS), Git/GitHub e AI-Assisted Development.
 
-## 🚀 Como testar este projeto localmente
+🚀 Como testar este projeto localmente
 
 1. Clone o repositório:
-   ```bash
-   git clone [https://github.com/MTaranto/nome-do-seu-repositorio.git](https://github.com/MTaranto/nome-do-seu-repositorio.git)
+```bash
+git clone [https://github.com/MTaranto/ListaRenata.git](https://github.com/MTaranto/ListaRenata.git)
+```
+
+2. Configure as Variáveis de Ambiente:
+O projeto utiliza um arquivo `.gitignore` para proteger credenciais sensíveis. Para rodar localmente, você precisará criar o seu próprio arquivo de configuração:
+- Renomeie o arquivo de demonstração `config.example.js` para `config.js`.
+- Insira as suas credenciais reais do Supabase (URL e Chave Pública) dentro do novo `config.js`.
+
+3. Execute a aplicação:
+Abra o arquivo `index.html` em qualquer navegador moderno. Não é necessário processo de build ou servidor local (Node.js/npm) graças à arquitetura serverless.
