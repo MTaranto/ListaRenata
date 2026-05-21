@@ -18,12 +18,11 @@
             </div>
     </div>
 
-    <script>
-        const SUPABASE_URL = 'https://dihsxacoolaqxlloliag.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_SQqUpy0HALaleCVE1af28w_8e3UEfwu';
+<script src="config.js"></script>
 
-// CORREÇÃO: Mesma coisa aqui, usando 'db'
-        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+<script>
+
+const db = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
 async function carregar() {
             const { data, error } = await db.from('presentes').select('*').order('nome');
